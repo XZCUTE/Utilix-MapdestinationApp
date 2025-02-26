@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>UTILIX MAP APP</title>
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+</head>
+<body>
+  <div class="app-container">
+    <header class="app-header">
+      <div class="logo">
+        <h1>UTILIX MAP</h1>
+      </div>
+      <div class="search-container">
+        <input type="text" id="search-input" placeholder="Search for a location...">
+        <div id="search-results" class="search-results"></div>
+      </div>
+    </header>
+    
+    <main>
+      <div id="map"></div>
+      
+      <div id="pin-details" class="pin-details">
+        <div class="pin-details-header">
+          <h2>Pin Details</h2>
+          <button id="close-pin-details">×</button>
+        </div>
+        <div class="pin-details-content">
+          <div class="form-group">
+            <label for="pin-name">Name</label>
+            <input type="text" id="pin-name" placeholder="Enter pin name">
+          </div>
+          <div class="form-group">
+            <label for="pin-color">Color</label>
+            <select id="pin-color">
+              <option value="red">Red</option>
+              <option value="green">Green</option>
+              <option value="purple">Purple</option>
+              <option value="orange">Orange</option>
+              <option value="black">Black</option>
+              <option value="yellow">Yellow</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="alert-distance">Alert Distance (meters)</label>
+            <input type="number" id="alert-distance" min="100" step="100" value="500">
+          </div>
+          <div class="button-group">
+            <button id="save-pin" class="primary-button">Save</button>
+            <button id="delete-pin" class="danger-button">Delete</button>
+          </div>
+        </div>
+      </div>
+      
+      <button id="my-location-btn" class="my-location-btn">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-navigation"><polygon points="3 11 22 2 13 21 11 13 3 11"/></svg>
+      </button>
+    </main>
+  </div>
+  
+  <audio id="alert-sound" src="https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3" preload="auto"></audio>
+  
+  <script src="script.js"></script>
+</body>
+</html>
