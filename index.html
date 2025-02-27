@@ -16,17 +16,34 @@
     }
   </script>
   <script async
-    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAtO3INq-rgEfNcue6rszQvPbLcOA8Gtvc&libraries=places&callback=initMap">
+    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAtO3INq-rgEfNcue6rszQvPbLcOA8Gtvc&libraries=places,directions&callback=initMap">
   </script>
 </head>
 <body>
-  <div class="app-container">
+  <div id="cookie-consent" class="cookie-consent">
+    <div class="cookie-content">
+      <h2>Cookie Consent</h2>
+      <p>This app requires cookies and location services to function properly. By clicking "Accept", you agree to allow us to use cookies and access your location.</p>
+      <button id="accept-cookies" class="cookie-btn">Accept</button>
+    </div>
+  </div>
+  <div class="app-container" style="display: none;">
     <header class="app-header">
       <div class="logo">
         <h1>UTILIX MAP</h1>
       </div>
       <div class="search-container">
-        <input type="text" id="search-input" placeholder="Search for a location...">
+        <div class="search-box">
+          <input type="text" id="search-input" placeholder="Search for a location...">
+        </div>
+        <div class="search-box">
+          <input type="text" id="destination-input" placeholder="Search for destination...">
+          <div class="destination-buttons">
+            <button id="add-destination" class="destination-btn">Add Destination</button>
+            <button id="another-route" class="destination-btn" style="display: none;">Another Route</button>
+            <button id="remove-destination" class="destination-btn">Remove Destination</button>
+          </div>
+        </div>
       </div>
       <button id="stop-alarms" class="stop-alarms-btn">
         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.89 2 2 2zm6-6v-5c0-3.07-1.64-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.63 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z"/></svg>

@@ -1,6 +1,34 @@
 // Create a namespace for our application
 window.app = window.app || {};
 
+// Check if cookies are accepted
+function checkCookieConsent() {
+  return getCookie('utilixMapConsent') === 'accepted';
+}
+
+// Handle cookie consent
+function handleCookieConsent() {
+  document.getElementById('accept-cookies').addEventListener('click', () => {
+    setCookie('utilixMapConsent', 'accepted', 365);
+    document.getElementById('cookie-consent').style.display = 'none';
+    document.querySelector('.app-container').style.display = 'flex';
+    // Initialize the app after consent
+    initializeApp();
+  });
+}
+
+// Initialize the application
+function initializeApp() {
+  // Load saved pins from cookies
+  loadPinsFromCookies();
+  
+  // Initialize audio
+  initializeAudio();
+  
+  // Setup event listeners that don't depend on map
+  setupInitialEventListeners();
+}
+
 // Global variables
 let map;
 let userMarker;
@@ -11,6 +39,12 @@ let currentEditingPin = null;
 let watchId;
 let alertsPlaying = {};
 let searchBox;
+let destinationBox;
+let directionsService;
+let directionsRenderer;
+let currentRoute = null;
+let destinationMarker = null;
+let currentRouteIndex = 0;
 let mapLoaded = false;
 
 // Initialize audio context
@@ -18,14 +52,17 @@ let audioContext;
 
 // Initialize the application when the DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
-  // Load saved pins from cookies
-  loadPinsFromCookies();
-  
-  // Initialize audio
-  initializeAudio();
-  
-  // Setup event listeners that don't depend on map
-  setupInitialEventListeners();
+  if (checkCookieConsent()) {
+    // If consent already given, show app and initialize
+    document.getElementById('cookie-consent').style.display = 'none';
+    document.querySelector('.app-container').style.display = 'flex';
+    initializeApp();
+  } else {
+    // Otherwise, show cookie consent and wait for acceptance
+    document.getElementById('cookie-consent').style.display = 'flex';
+    document.querySelector('.app-container').style.display = 'none';
+    handleCookieConsent();
+  }
 });
 
 // Initialize audio
@@ -184,6 +221,15 @@ function getCookie(name) {
 
 // Initialize map (called by Google Maps API when loaded)
 window.app.initMap = function() {
+  // Initialize Directions Service and Renderer
+  directionsService = new google.maps.DirectionsService();
+  directionsRenderer = new google.maps.DirectionsRenderer({
+    suppressMarkers: true,
+    polylineOptions: {
+      strokeColor: '#1877f2',
+      strokeWeight: 5
+    }
+  });
   const mapOptions = {
     zoom: 2,
     center: { lat: 0, lng: 0 },
@@ -207,13 +253,24 @@ window.app.initMap = function() {
   
   map = new google.maps.Map(document.getElementById('map'), mapOptions);
   
-  // Initialize the Places Autocomplete
+  // Initialize the Places Autocomplete for both search boxes
   const input = document.getElementById('search-input');
+  const destinationInput = document.getElementById('destination-input');
+  
   searchBox = new google.maps.places.Autocomplete(input, {
     fields: ['geometry', 'name'],
     strictBounds: false,
     types: ['geocode', 'establishment']
   });
+  
+  destinationBox = new google.maps.places.Autocomplete(destinationInput, {
+    fields: ['geometry', 'name'],
+    strictBounds: false,
+    types: ['geocode', 'establishment']
+  });
+  
+  // Set the directions renderer to the map
+  directionsRenderer.setMap(map);
   
   // Create user marker
   userMarker = new google.maps.Marker({
@@ -269,8 +326,159 @@ function setupMapEventListeners() {
   document.getElementById('close-pin-details').addEventListener('click', closePinDetails);
   document.getElementById('save-pin').addEventListener('click', savePin);
   document.getElementById('delete-pin').addEventListener('click', deletePin);
+  document.getElementById('add-destination').addEventListener('click', addDestination);
+  document.getElementById('remove-destination').addEventListener('click', removeDestination);
+  document.getElementById('another-route').addEventListener('click', showNextRoute);
   searchBox.addListener('place_changed', handlePlaceSelection);
+  destinationBox.addListener('place_changed', handleDestinationSelection);
   map.addListener('click', handleMapClick);
+}
+
+// Handle destination selection from autocomplete
+function handleDestinationSelection() {
+  const place = destinationBox.getPlace();
+  if (!place.geometry) return;
+  
+  const destination = {
+    lat: place.geometry.location.lat(),
+    lng: place.geometry.location.lng()
+  };
+  
+  calculateAndDisplayRoute(destination);
+}
+
+// Add destination and calculate route
+function addDestination() {
+  const destinationInput = document.getElementById('destination-input');
+  if (!destinationInput.value) {
+    alert('Please enter a destination');
+    return;
+  }
+  
+  const place = destinationBox.getPlace();
+  if (!place || !place.geometry) {
+    alert('Please select a valid destination from the dropdown');
+    return;
+  }
+  
+  const destination = {
+    lat: place.geometry.location.lat(),
+    lng: place.geometry.location.lng()
+  };
+  
+  calculateAndDisplayRoute(destination);
+}
+
+// Remove destination and clear route
+function removeDestination() {
+  if (currentRoute) {
+    directionsRenderer.setDirections({ routes: [] });
+    currentRoute = null;
+    currentRouteIndex = 0;
+    document.getElementById('destination-input').value = '';
+    document.getElementById('another-route').style.display = 'none';
+    
+    // Remove destination marker
+    if (destinationMarker) {
+      destinationMarker.setMap(null);
+      destinationMarker = null;
+    }
+  }
+}
+
+// Show next alternative route
+function showNextRoute() {
+  if (!currentRoute || !currentRoute.routes || currentRoute.routes.length <= 1) return;
+  
+  currentRouteIndex = (currentRouteIndex + 1) % currentRoute.routes.length;
+  
+  const newRoute = {
+    ...currentRoute,
+    routes: [currentRoute.routes[currentRouteIndex]]
+  };
+  
+  directionsRenderer.setDirections(newRoute);
+}
+
+// Calculate and display route
+function calculateAndDisplayRoute(destination) {
+  if (!userPosition) {
+    alert('Please enable location services to get directions');
+    return;
+  }
+
+    // Create or update destination marker
+    if (!destinationMarker) {
+      destinationMarker = new google.maps.Marker({
+        position: destination,
+        map: map,
+        draggable: false, // Start as non-draggable
+        icon: {
+          path: google.maps.SymbolPath.BACKWARD_CLOSED_ARROW,
+          scale: 6,
+          fillColor: "#dc3545",
+          fillOpacity: 1,
+          strokeColor: '#ffffff',
+          strokeWeight: 2
+        }
+      });
+
+      // Add double click listener to toggle draggable state
+      destinationMarker.addListener('dblclick', () => {
+        const isDraggable = destinationMarker.getDraggable();
+        destinationMarker.setDraggable(!isDraggable);
+        
+        // Change cursor and color to indicate draggable state
+        if (!isDraggable) {
+          destinationMarker.setIcon({
+            ...destinationMarker.getIcon(),
+            fillColor: "#28a745" // Green when draggable
+          });
+          destinationMarker.setCursor('move');
+        } else {
+          destinationMarker.setIcon({
+            ...destinationMarker.getIcon(),
+            fillColor: "#dc3545" // Red when not draggable
+          });
+          destinationMarker.setCursor('pointer');
+        }
+      });
+
+      // Add drag event listeners
+      destinationMarker.addListener('dragend', () => {
+        const newPos = destinationMarker.getPosition();
+        calculateAndDisplayRoute({
+          lat: newPos.lat(),
+          lng: newPos.lng()
+        });
+      });
+  } else {
+    destinationMarker.setPosition(destination);
+  }
+  
+  const request = {
+    origin: userPosition,
+    destination: destination,
+    travelMode: google.maps.TravelMode.DRIVING,
+    provideRouteAlternatives: true // Request alternative routes
+  };
+  
+  directionsService.route(request, (result, status) => {
+    if (status === google.maps.DirectionsStatus.OK) {
+      directionsRenderer.setDirections(result);
+      currentRoute = result;
+      currentRouteIndex = 0;
+      
+      // Show "Another Route" button if there are alternative routes
+      const anotherRouteBtn = document.getElementById('another-route');
+      anotherRouteBtn.style.display = result.routes.length > 1 ? 'block' : 'none';
+      
+      // Keep destination marker visible
+      destinationMarker.setMap(map);
+    } else {
+      alert('Could not calculate directions: ' + status);
+    }
+  });
 }
 
 // Handle place selection from autocomplete
