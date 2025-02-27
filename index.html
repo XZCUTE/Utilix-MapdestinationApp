@@ -5,8 +5,19 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>UTILIX MAP APP</title>
   <link rel="stylesheet" href="styles.css">
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+  <!-- Preload Google Maps API for faster loading -->
+  <link rel="preconnect" href="https://maps.googleapis.com">
+  <link rel="preconnect" href="https://maps.gstatic.com">
+  <script>
+    function initMap() {
+      if (window.app && window.app.initMap) {
+        window.app.initMap();
+      }
+    }
+  </script>
+  <script async
+    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAtO3INq-rgEfNcue6rszQvPbLcOA8Gtvc&libraries=places&callback=initMap">
+  </script>
 </head>
 <body>
   <div class="app-container">
@@ -16,8 +27,11 @@
       </div>
       <div class="search-container">
         <input type="text" id="search-input" placeholder="Search for a location...">
-        <div id="search-results" class="search-results"></div>
       </div>
+      <button id="stop-alarms" class="stop-alarms-btn">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.89 2 2 2zm6-6v-5c0-3.07-1.64-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.63 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z"/></svg>
+        Stop All Alarms
+      </button>
     </header>
     
     <main>
@@ -48,6 +62,16 @@
             <label for="alert-distance">Alert Distance (meters)</label>
             <input type="number" id="alert-distance" min="100" step="100" value="500">
           </div>
+          <div class="form-group">
+            <label for="alert-sound">Alert Type</label>
+            <select id="alert-sound">
+              <option value="beep1">Fast Beep (Most Annoying)</option>
+              <option value="beep2">Medium Beep</option>
+              <option value="beep3">Slow Beep</option>
+              <option value="beep4">Very Fast Beep</option>
+            </select>
+            <button id="test-sound" class="secondary-button mt-2">Test Sound</button>
+          </div>
           <div class="button-group">
             <button id="save-pin" class="primary-button">Save</button>
             <button id="delete-pin" class="danger-button">Delete</button>
@@ -56,12 +80,10 @@
       </div>
       
       <button id="my-location-btn" class="my-location-btn">
-        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-navigation"><polygon points="3 11 22 2 13 21 11 13 3 11"/></svg>
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="3 11 22 2 13 21 11 13 3 11"/></svg>
       </button>
     </main>
   </div>
-  
-  <audio id="alert-sound" src="https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3" preload="auto"></audio>
   
   <script src="script.js"></script>
 </body>
