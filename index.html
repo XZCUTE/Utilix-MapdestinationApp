@@ -1,142 +1,34 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>UTILIX MAP APP</title>
-  <link rel="stylesheet" href="styles.css">
-  <!-- Favicon -->
-  <link rel="icon" type="image/x-icon" href="public/favicon.ico">
-  <link rel="apple-touch-icon" sizes="180x180" href="public/apple-touch-icon.png">
-  <link rel="icon" type="image/png" sizes="32x32" href="public/favicon-32x32.png">
-  <link rel="icon" type="image/png" sizes="16x16" href="public/favicon-16x16.png">
-  <!-- Preload Google Maps API for faster loading -->
-  <link rel="preconnect" href="https://maps.googleapis.com">
-  <link rel="preconnect" href="https://maps.gstatic.com">
-  <script>
-    function initMap() {
-      if (window.app && window.app.initMap) {
-        window.app.initMap();
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Utilix Map - Smart destination alerts and routing powered by Google Maps" />
+    <title>UTILIX MAP</title>
+    <!-- Preload Google Maps API -->
+    <link rel="preconnect" href="https://maps.googleapis.com" />
+    <link rel="preconnect" href="https://maps.gstatic.com" />
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <script>
+      // Global map init callback used by Google Maps API
+      function initMap() {
+        if (window.__mapInitCallback) window.__mapInitCallback();
       }
-    }
-  </script>
-  <script async
-    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAtO3INq-rgEfNcue6rszQvPbLcOA8Gtvc&libraries=places,directions&callback=initMap">
-  </script>
-</head>
-<body>
-  <div id="cookie-consent" class="cookie-consent">
-    <div class="cookie-content">
-      <h2>Cookie Consent</h2>
-      <p>This app requires cookies and location services to function properly. By clicking "Accept", you agree to allow us to use cookies and access your location.</p>
-      <button id="accept-cookies" class="cookie-btn">Accept</button>
-    </div>
-  </div>
-  <div class="app-container" style="display: none;">
-    <header class="app-header">
-      <div class="logo">
-        <h1>UTILIX MAP</h1>
-      </div>
-      <div class="search-container">
-        <div class="search-box">
-          <div class="search-input-wrapper">
-            <input type="text" id="search-input" placeholder="Search for a location...">
-            <svg class="search-icon" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-          </div>
-        </div>
-        <div class="search-box">
-          <div class="search-input-wrapper">
-            <input type="text" id="destination-input" placeholder="Search for destination...">
-            <svg class="search-icon" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
-          </div>
-          <div class="destination-buttons">
-            <button id="add-destination" class="destination-btn">Add Destination</button>
-            <button id="another-route" class="destination-btn" style="display: none;">Another Route</button>
-            <button id="remove-destination" class="destination-btn">Remove Destination</button>
-          </div>
-        </div>
-      </div>
-      <button id="stop-alarms" class="stop-alarms-btn">
-        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.89 2 2 2zm6-6v-5c0-3.07-1.64-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.63 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z"/></svg>
-        Stop All Alarms
-      </button>
-    </header>
-    
-    <!-- Header Toggle Button -->
-    <button id="header-toggle" class="header-toggle">
-      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
-    </button>
-    
-    <main>
-      <div id="map"></div>
-      
-      <div id="pin-details" class="pin-details">
-        <div class="pin-details-header">
-          <h2>Pin Details</h2>
-          <button id="close-pin-details">×</button>
-        </div>
-        <div class="pin-details-content">
-          <div class="form-group">
-            <label for="pin-name">Name</label>
-            <input type="text" id="pin-name" placeholder="Enter pin name">
-          </div>
-          <div class="form-group">
-            <label for="pin-color">Color</label>
-            <select id="pin-color">
-              <option value="red">Red</option>
-              <option value="green">Green</option>
-              <option value="purple">Purple</option>
-              <option value="orange">Orange</option>
-              <option value="black">Black</option>
-              <option value="yellow">Yellow</option>
-            </select>
-          </div>
-          <div class="form-group">
-            <label for="alert-distance">Alert Distance (meters)</label>
-            <input type="number" id="alert-distance" min="100" step="100" value="500">
-          </div>
-          <div class="form-group">
-            <label for="alert-sound">Alert Type</label>
-            <select id="alert-sound">
-              <option value="beep1">Fast Beep (Most Annoying)</option>
-              <option value="beep2">Medium Beep</option>
-              <option value="beep3">Slow Beep</option>
-              <option value="beep4">Very Fast Beep</option>
-            </select>
-            <button id="test-sound" class="secondary-button mt-2">Test Sound</button>
-          </div>
-          <div class="button-group">
-            <button id="save-pin" class="primary-button">Save</button>
-            <button id="delete-pin" class="danger-button">Delete</button>
-          </div>
-        </div>
-      </div>
-      
-      <button id="my-location-btn" class="my-location-btn">
-        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="3 11 22 2 13 21 11 13 3 11"/></svg>
-      </button>
-    </main>
-  </div>
-  
-  <script src="script.js"></script>
-  <script>
-    // Header toggle functionality
-    document.addEventListener('DOMContentLoaded', function() {
-      const headerToggle = document.getElementById('header-toggle');
-      const appHeader = document.querySelector('.app-header');
-      const mapContainer = document.getElementById('map');
-      
-      headerToggle.addEventListener('click', function() {
-        appHeader.classList.toggle('collapsed');
-        headerToggle.classList.toggle('collapsed');
-        
-        // Give time for the header animation to complete before resizing the map
-        setTimeout(function() {
-          // Trigger a resize event to make sure the map renders correctly
-          window.dispatchEvent(new Event('resize'));
-        }, 300);
-      });
-    });
-  </script>
-</body>
+    </script>
+    <script
+      async
+      src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAtO3INq-rgEfNcue6rszQvPbLcOA8Gtvc&libraries=places,geometry&callback=initMap"
+    ></script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.jsx"></script>
+  </body>
 </html>

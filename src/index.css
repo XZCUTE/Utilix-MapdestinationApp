@@ -1,0 +1,175 @@
+/* ============================================
+   UTILIX MAP — Global Design System
+   Premium dark-theme with glassmorphism
+   ============================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
+/* ---- CSS Variables ---- */
+:root {
+  --font: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+
+  /* Background layers */
+  --bg-base: #080b12;
+  --bg-surface: #0f1322;
+  --bg-card: #141829;
+  --bg-elevated: #1c2138;
+  --bg-hover: #222840;
+
+  /* Glass effect */
+  --glass-bg: rgba(15, 19, 34, 0.82);
+  --glass-border: rgba(255, 255, 255, 0.07);
+  --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.45);
+
+  /* Accent palette */
+  --accent: #4f8eff;
+  --accent-bright: #6ba3ff;
+  --accent-dim: rgba(79, 142, 255, 0.18);
+  --accent-glow: rgba(79, 142, 255, 0.35);
+
+  /* Semantic colors */
+  --danger: #ff4757;
+  --danger-dim: rgba(255, 71, 87, 0.18);
+  --danger-dark: #e03040;
+  --success: #2ed573;
+  --success-dim: rgba(46, 213, 115, 0.18);
+  --success-dark: #1fba60;
+  --warning: #ffa502;
+
+  /* Text */
+  --text-primary: #eef0f8;
+  --text-secondary: #8890ab;
+  --text-muted: #555e7a;
+
+  /* Borders */
+  --border: rgba(255, 255, 255, 0.08);
+  --border-focus: var(--accent);
+
+  /* Effects */
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 24px;
+  --radius-full: 9999px;
+  --transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-slow: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ---- Reset ---- */
+*, *::before, *::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body, #root {
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+}
+
+body {
+  font-family: var(--font);
+  background: var(--bg-base);
+  color: var(--text-primary);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ---- Scrollbar ---- */
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  background: var(--bg-card);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--bg-elevated);
+  border-radius: var(--radius-full);
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--text-muted);
+}
+
+/* ---- Utility: backdrop blur card ---- */
+.glass-card {
+  background: var(--glass-bg);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--glass-shadow);
+}
+
+/* ---- Google Maps autocomplete dropdown styling override ---- */
+.pac-container {
+  background: var(--bg-card) !important;
+  border: 1px solid var(--border) !important;
+  border-top: none !important;
+  border-radius: 0 0 var(--radius-md) var(--radius-md) !important;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.6) !important;
+  font-family: var(--font) !important;
+}
+
+.pac-item {
+  padding: 10px 14px !important;
+  border-top: 1px solid var(--border) !important;
+  color: var(--text-primary) !important;
+  font-size: 0.875rem !important;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.pac-item:hover,
+.pac-item-selected {
+  background: var(--bg-elevated) !important;
+}
+
+.pac-item-query {
+  color: var(--text-primary) !important;
+  font-size: 0.875rem !important;
+}
+
+.pac-matched {
+  color: var(--accent-bright) !important;
+  font-weight: 600 !important;
+}
+
+.pac-icon {
+  filter: invert(1) opacity(0.5) !important;
+}
+
+/* ---- Animations ---- */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from { transform: translateY(20px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+@keyframes slideInRight {
+  from { transform: translateX(100%); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+
+@keyframes slideInUp {
+  from { transform: translateY(100%); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+@keyframes pulse {
+  0%, 100% { transform: scale(1); box-shadow: 0 0 0 0 var(--accent-glow); }
+  50% { transform: scale(1.05); box-shadow: 0 0 0 12px rgba(79, 142, 255, 0); }
+}
+
+@keyframes ripple {
+  0% { transform: scale(0.8); opacity: 1; }
+  100% { transform: scale(2.5); opacity: 0; }
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
